@@ -1,0 +1,66 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('commit') {
+            steps {
+                // Récupération du code depuis GitHub
+                checkout scm
+                sh 'echo "Code téléchargé depuis GitHub..."'
+                sh 'ls -la'
+            }
+        }
+
+        stage('build') {
+            steps {
+                // Compilation du projet Java avec Maven
+                sh 'mvn -B clean package'
+            }
+        }
+    }
+
+    post {
+        success {
+            emailext(
+                subject: "Jenkins BUILD SUCCESS - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    Bonjour,
+
+                    Le build du projet s'est déroulé avec succès.
+
+                    Détails :
+                    - Job : ${env.JOB_NAME}
+                    - Build : #${env.BUILD_NUMBER}
+                    - URL : ${env.BUILD_URL}
+
+                    Cordialement,
+                    Jenkins CI
+                """,
+                to: "mariemazzouz1234@gmail.com"
+            )
+        }
+
+        failure {
+            emailext(
+                subject: "Jenkins BUILD FAILED - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    Bonjour,
+
+                    Le build du projet a échoué.
+
+                    Détails :
+                    - Job : ${env.JOB_NAME}
+                    - Build : #${env.BUILD_NUMBER}
+                    - URL : ${env.BUILD_URL}
+
+                    Veuillez consulter les logs Jenkins pour identifier l'erreur.
+
+                    Cordialement,
+                    Jenkins CI
+                """,
+                to: "mariemazzouz1234@gmail.com"
+            )
+        }
+    }
+}
