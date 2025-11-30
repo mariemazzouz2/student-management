@@ -10,7 +10,4 @@ class StudentManagementApplicationTests {
     void contextLoads() {
     }
 
-
-
-
 }
